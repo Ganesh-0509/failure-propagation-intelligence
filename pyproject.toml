@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fpi"
+version = "0.1.0"
+description = "Failure Propagation Intelligence — Edge-AI decision support for EV subsystem failure propagation (research/hackathon MVP)"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Ganesh Kumar T" }]
+dependencies = [
+    "networkx>=3.2",
+    "numpy>=1.26",
+    "scikit-learn>=1.4",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+onnx = ["onnx>=1.15", "onnxruntime>=1.17", "skl2onnx>=1.16"]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[tool.setuptools.packages.find]
+include = ["fpi*", "api*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

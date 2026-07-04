@@ -1,0 +1,16 @@
+# FPI core + API (Python 3.11)
+networkx>=3.2
+numpy>=1.26
+scikit-learn>=1.4
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+
+# ML export / edge inference (optional at demo time; sklearn is the fallback)
+# onnx>=1.15
+# onnxruntime>=1.17
+# skl2onnx>=1.16
+
+# Dev / test
+pytest>=8.0
+httpx>=0.27          # FastAPI TestClient

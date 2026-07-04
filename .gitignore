@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# FPI generated data & models
+data/*.json
+!data/.gitignore
+*.onnx
+
+# Node / dashboard
+dashboard/node_modules/
+dashboard/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tooling / local agent + skill state (not part of the project source)
+.agents/
+.claude/
+.pytest_cache/
+skills-lock.json
