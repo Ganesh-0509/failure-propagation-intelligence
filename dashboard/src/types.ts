@@ -28,8 +28,9 @@ export interface PropagationPath {
   origin: string;
   steps: PathStep[];
   path_probability: number;
-  next_node: string;
-  eta_next_cycles: number;
+  // Null when the path is a single origin node with no forecast next hop.
+  next_node: string | null;
+  eta_next_cycles: number | null;
 }
 
 /** Trust score (Stage 2) — inspectable, never merged with impact. */
@@ -57,14 +58,18 @@ export interface Recommendation {
   impact: ImpactScore;
 }
 
-/** The full pipeline output for a single signal window. */
+/** The full pipeline output for a single signal window.
+ *
+ * On NOMINAL windows (no subsystem's fault_probability crosses the alert
+ * threshold) the backend emits null for best_path/trust/impact/recommendation.
+ * subsystem_health and detections are always present. */
 export interface PipelineResult {
   detections: Detection[];
-  best_path: PropagationPath;
+  best_path: PropagationPath | null;
   all_paths: PropagationPath[];
-  trust: TrustScore;
-  impact: ImpactScore;
-  recommendation: Recommendation;
+  trust: TrustScore | null;
+  impact: ImpactScore | null;
+  recommendation: Recommendation | null;
   subsystem_health: Record<string, Health>;
 }
 

@@ -3,8 +3,16 @@ import { title } from "../format";
 import { Panel } from "./Panel";
 
 interface Props {
-  rec: Recommendation;
+  rec: Recommendation | null;
 }
+
+/** The non-autonomy disclaimer — shown on every window, nominal or not. */
+const DISCLAIMER = (
+  <p className="rec__disclaimer">
+    Verification guidance only — never an autonomous action. A technician confirms
+    and performs any physical inspection or repair.
+  </p>
+);
 
 /**
  * Panel 6 — Recommended Verification Steps.
@@ -12,6 +20,24 @@ interface Props {
  * signals. Includes the mandatory non-autonomy disclaimer.
  */
 export function Recommendations({ rec }: Props) {
+  // Nominal window: nothing crossed the alert threshold, so no verification step.
+  if (!rec) {
+    return (
+      <Panel
+        title="Recommended Verification"
+        subtitle="No target subsystem"
+        className="panel--rec"
+      >
+        <div className="rec">
+          <p className="panel__empty">
+            No verification step required — all subsystems nominal.
+          </p>
+          {DISCLAIMER}
+        </div>
+      </Panel>
+    );
+  }
+
   return (
     <Panel
       title="Recommended Verification"
@@ -49,10 +75,7 @@ export function Recommendations({ rec }: Props) {
           </div>
         )}
 
-        <p className="rec__disclaimer">
-          Verification guidance only — never an autonomous action. A technician confirms
-          and performs any physical inspection or repair.
-        </p>
+        {DISCLAIMER}
       </div>
     </Panel>
   );

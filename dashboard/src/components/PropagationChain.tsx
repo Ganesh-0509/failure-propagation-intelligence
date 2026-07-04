@@ -24,6 +24,24 @@ interface ChainNode {
 export function PropagationChain({ result }: Props) {
   const { best_path } = result;
 
+  // Nominal window: no path crossed the alert threshold.
+  if (!best_path) {
+    return (
+      <Panel
+        title="Active Propagation Chain"
+        subtitle="No path above alert threshold"
+        className="panel--chain"
+      >
+        <p className="panel__empty">
+          No propagation chain above threshold (nominal).
+        </p>
+      </Panel>
+    );
+  }
+
+  // next_node can be null even when a path exists (single-node origin, no forecast hop).
+  const nextLabel = best_path.next_node ? title(best_path.next_node) : "—";
+
   const nodes: ChainNode[] = [
     {
       key: best_path.origin,
@@ -54,11 +72,11 @@ export function PropagationChain({ result }: Props) {
   return (
     <Panel
       title="Active Propagation Chain"
-      subtitle={`Origin ${title(best_path.origin)} · next ${title(
-        best_path.next_node,
-      )} in ${cycles(best_path.eta_next_cycles)} · path probability ${pct(
-        best_path.path_probability,
-      )}`}
+      subtitle={`Origin ${title(best_path.origin)} · next ${nextLabel}${
+        best_path.eta_next_cycles !== null
+          ? ` in ${cycles(best_path.eta_next_cycles)}`
+          : ""
+      } · path probability ${pct(best_path.path_probability)}`}
       className="panel--chain"
     >
       <div className="chain" role="list">

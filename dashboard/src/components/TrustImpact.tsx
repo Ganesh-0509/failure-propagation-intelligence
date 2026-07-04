@@ -3,8 +3,8 @@ import { humanizeKey } from "../format";
 import { Panel } from "./Panel";
 
 interface Props {
-  trust: TrustScore;
-  impact: ImpactScore;
+  trust: TrustScore | null;
+  impact: ImpactScore | null;
 }
 
 function FactorBars({ factors, tone }: { factors: Record<string, number>; tone: string }) {
@@ -33,6 +33,19 @@ function FactorBars({ factors, tone }: { factors: Record<string, number>; tone: 
  * Impact drives the alert sort order elsewhere in the app.
  */
 export function TrustImpact({ trust, impact }: Props) {
+  // Nominal window: no active prediction, so there is nothing to score.
+  if (!trust || !impact) {
+    return (
+      <Panel
+        title="Trust & Impact"
+        subtitle="Two independent scores — shown separately, never merged"
+        className="panel--scores"
+      >
+        <p className="panel__empty">No active prediction — subsystems nominal.</p>
+      </Panel>
+    );
+  }
+
   return (
     <Panel
       title="Trust & Impact"

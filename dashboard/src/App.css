@@ -237,6 +237,15 @@ body {
   flex: 1;
 }
 
+/* Nominal-window placeholder: subtle, keeps the panel present without alarming. */
+.panel__empty {
+  margin: 0;
+  padding: 8px 2px;
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--muted);
+}
+
 /* --- Buttons / controls ---------------------------------------------------- */
 .btn {
   background: var(--panel);

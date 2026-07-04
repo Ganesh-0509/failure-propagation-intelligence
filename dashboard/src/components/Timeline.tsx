@@ -82,6 +82,17 @@ export function Timeline({ scenario, current, playing, onSeek, onTogglePlay }: P
           const flagged = SUBSYSTEMS.filter(
             (s) => step.subsystem_health[s] === "flagged",
           ).map(title);
+          // best_path/trust/impact are null on nominal windows — guard each.
+          const bp = step.best_path;
+          const nextLabel = bp?.next_node ? title(bp.next_node) : null;
+          const watchLabel = bp ? title(bp.origin) : null;
+          const desc = flagged.length
+            ? `${flagged.join(", ")} flagged${
+                nextLabel ? ` · next ${nextLabel}` : ""
+              }`
+            : watchLabel
+              ? `nominal · watching ${watchLabel}`
+              : "nominal";
           return (
             <li
               key={i}
@@ -90,13 +101,10 @@ export function Timeline({ scenario, current, playing, onSeek, onTogglePlay }: P
             >
               <span className={`health-dot health-dot--${w}`} aria-hidden />
               <span className="log__win">W{i}</span>
-              <span className="log__desc">
-                {flagged.length
-                  ? `${flagged.join(", ")} flagged · next ${title(step.best_path.next_node)}`
-                  : `nominal · watching ${title(step.best_path.origin)}`}
-              </span>
+              <span className="log__desc">{desc}</span>
               <span className="log__scores">
-                T {Math.round(step.trust.value)} · I {Math.round(step.impact.value)}
+                T {step.trust ? Math.round(step.trust.value) : "—"} · I{" "}
+                {step.impact ? Math.round(step.impact.value) : "—"}
               </span>
             </li>
           );

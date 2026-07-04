@@ -11,6 +11,12 @@ import { SignalTrends } from "./components/SignalTrends";
 import { Recommendations } from "./components/Recommendations";
 import { Timeline } from "./components/Timeline";
 
+/** First window with an active propagation chain, or 0 if all are nominal. */
+function firstActiveWindow(scenario: Scenario): number {
+  const idx = scenario.steps.findIndex((s) => s.best_path !== null);
+  return idx === -1 ? 0 : idx;
+}
+
 export default function App() {
   const [scenario, setScenario] = useState<Scenario>(SAMPLE_SCENARIO);
   const [graph, setGraph] = useState<Graph>(SAMPLE_GRAPH);
@@ -30,7 +36,9 @@ export default function App() {
       setGraph(gr.data);
       // "live" only if BOTH came from the backend.
       setSource(sc.source === "live" && gr.source === "live" ? "live" : "sample");
-      setCurrent(0);
+      // Open on the first interesting frame; panels still render safely if the
+      // user scrubs back to a nominal window.
+      setCurrent(firstActiveWindow(sc.data));
       setLoading(false);
     })();
     return () => {
