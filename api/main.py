@@ -180,11 +180,20 @@ class EvaluateRequest(BaseModel):
     step: int = -1  # which timeline index to return; -1 = last
 
 
+@lru_cache(maxsize=16)
+def _run_params(kind: str, inject_at: int, n_windows: int) -> list[PipelineResult]:
+    """Generate and evaluate a scenario, memoized by its parameters.
+
+    Without this, every /api/evaluate call regenerated the full N-window scenario
+    and re-ran the whole timeline just to return one step. Caching keeps per-request
+    latency edge-realistic for repeated calls with the same parameters.
+    """
+    scenario = generate_scenario(kind=kind, n_windows=n_windows, seed=7, inject_at=inject_at)
+    return get_pipeline().run_scenario(scenario)
+
+
 @app.post("/api/evaluate")
 def evaluate(req: EvaluateRequest) -> dict:
-    scenario = generate_scenario(
-        kind=req.kind, n_windows=req.n_windows, seed=7, inject_at=req.inject_at
-    )
-    results = get_pipeline().run_scenario(scenario)
+    results = _run_params(req.kind, req.inject_at, req.n_windows)
     idx = req.step if -len(results) <= req.step < len(results) else -1
     return result_json(results[idx])
