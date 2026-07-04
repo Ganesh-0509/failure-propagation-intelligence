@@ -24,3 +24,7 @@ Thumbs.db
 .claude/
 .pytest_cache/
 skills-lock.json
+
+# Internal source document — kept local only, never published
+Failure_Propagation_Intelligence_Whitepaper (1).docx
+*.docx
