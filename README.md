@@ -16,13 +16,21 @@ full build plan mapped to the whitepaper sections.
 
 ## Dashboard
 
-![FPI technician dashboard — the §14 panel grid](docs/dashboard.png)
+![FPI technician dashboard — Overview](docs/dashboard.png)
 
-The technician panel grid (§14) running on demonstration data: single-glance subsystem
-health, the active propagation chain with origin and next-at-risk nodes, **Trust and
-Impact shown as two separate scores (never merged)**, the subsystem dependency graph,
-signal trends, and verification-only recommendations. Shown here in offline sample mode;
-it renders the same against the live API.
+A sidebar-navigated technician tool. Each section is its own view with a plain-English
+**"What this shows / How it's computed"** explanation, and a persistent top-bar scrubber
+steps through the scenario window-by-window while keeping your place across views. Sections:
+Overview (subsystem health), Propagation Chain (origin + next-at-risk + ETA), **Trust &
+Impact** (two separate scores, never merged), Dependency Graph, Signal Trends,
+Recommendations (verification-only), Timeline, and **How It Works**.
+
+The *How It Works* view states the pipeline and the data-honesty boundary explicitly:
+
+![How It Works — pipeline and the real-vs-synthetic data boundary](docs/dashboard-howitworks.png)
+
+Shown here in offline sample mode; it renders the same against the live API (and handles
+nominal windows, where there is no active chain, without crashing).
 
 ---
 

@@ -1,6 +1,7 @@
 /* ==========================================================================
    FPI Technician Dashboard — styling
    Dark, high-contrast "engineer's tool" theme with a light-mode fallback.
+   Sidebar-navigated, multi-view layout with a persistent time-step top bar.
    ========================================================================== */
 
 :root {
@@ -24,6 +25,8 @@
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
   --font: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
   --mono: "SFMono-Regular", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --sidebar-w: 244px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -55,53 +58,157 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.app {
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 18px 20px 40px;
+/* --- App shell: sidebar + main -------------------------------------------- */
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
 }
 
-/* --- Header ---------------------------------------------------------------- */
-.app__header {
+/* --- Sidebar --------------------------------------------------------------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-2);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.app__brand {
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 14px;
 }
-.app__logo {
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar__logo {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), #6366f1);
   color: #05121c;
   font-weight: 800;
   letter-spacing: 0.5px;
-  font-size: 15px;
+  font-size: 14px;
+  flex-shrink: 0;
 }
-.app__title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 650;
-}
-.app__tagline {
-  margin: 2px 0 0;
-  color: var(--muted);
-  font-size: 12.5px;
-}
-.app__status {
+.sidebar__brand-text {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  min-width: 0;
+}
+.sidebar__name {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+}
+.sidebar__sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+.sidebar__hamburger {
+  display: none;
+  margin-left: auto;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 }
+.nav__item {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav__item:hover {
+  background: var(--panel);
+}
+.nav__item--active {
+  background: var(--panel);
+  border-color: var(--accent);
+}
+.nav__label {
+  font-size: 13.5px;
+  font-weight: 650;
+}
+.nav__item--active .nav__label {
+  color: var(--accent);
+}
+.nav__hint {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+/* --- Main column ----------------------------------------------------------- */
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* --- Persistent top bar (shared time-step scrubber) ------------------------ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 11px 22px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.topbar__transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar__scrub {
+  flex: 1;
+  min-width: 160px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.topbar__window {
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.topbar__window strong {
+  color: var(--text);
+  font-family: var(--mono);
+}
+
+/* --- Connection chip (used in the top bar) --------------------------------- */
 .conn {
   display: inline-flex;
   align-items: center;
@@ -111,6 +218,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   border: 1px solid var(--border);
+  white-space: nowrap;
 }
 .conn__dot {
   width: 8px;
@@ -131,18 +239,12 @@ body {
   background: var(--watch);
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
 }
-.app__api {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-}
 
 .app__notice {
-  margin: 14px 0 6px;
-  padding: 9px 13px;
-  border-radius: 8px;
+  margin: 0;
+  padding: 9px 22px;
   background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
   color: var(--text);
   font-size: 12.5px;
 }
@@ -151,50 +253,208 @@ body {
   text-align: center;
   color: var(--muted);
 }
+
+/* --- Content + view -------------------------------------------------------- */
+.content {
+  padding: 22px;
+  flex: 1;
+  max-width: 1180px;
+  width: 100%;
+}
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.view__header {
+  margin-bottom: 2px;
+}
+.view__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+.view__lede {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+/* "What is FPI" intro on the Overview view */
+.view__intro {
+  padding: 13px 15px;
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.view__intro-label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.view__intro p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* --- Explanation block (What / How) ---------------------------------------- */
+.explain {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 6%, var(--panel-2));
+  border: 1px dashed var(--border);
+}
+.explain__divider {
+  background: var(--border);
+}
+.explain__label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.explain__body {
+  font-size: 12.5px;
+  color: var(--text);
+}
+.explain__body p {
+  margin: 0 0 8px;
+}
+.explain__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- How It Works view ----------------------------------------------------- */
+.howto {
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.howto__h {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.howto__pipeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  counter-reset: stage;
+}
+.howto__pipeline li {
+  position: relative;
+  padding: 11px 13px 11px 14px;
+  border-radius: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+}
+.howto__stage {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 3px;
+}
+.howto__pipeline p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.howto--boundary .howto__lead {
+  margin: 0 0 12px;
+  font-size: 13px;
+}
+.howto__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.howto__table th,
+.howto__table td {
+  text-align: left;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+.howto__table th {
+  background: var(--panel-2);
+  font-weight: 650;
+}
+.howto__note {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.howto__note code {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
 .app__footer {
-  margin-top: 18px;
+  margin-top: 24px;
   padding-top: 14px;
   border-top: 1px solid var(--border);
   color: var(--muted);
   font-size: 11.5px;
 }
 
-/* --- Panel grid ------------------------------------------------------------ */
-.grid {
-  display: grid;
-  gap: 14px;
-  margin-top: 12px;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-areas:
-    "health chain  chain  rec"
-    "scores scores graph  rec"
-    "trends trends graph  rec"
-    "timeline timeline timeline timeline";
-}
-.grid__health { grid-area: health; }
-.grid__chain { grid-area: chain; }
-.grid__rec { grid-area: rec; }
-.grid__scores { grid-area: scores; }
-.grid__graph { grid-area: graph; }
-.grid__trends { grid-area: trends; }
-.grid__timeline { grid-area: timeline; }
-
-@media (max-width: 1080px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas:
-      "health chain"
-      "scores scores"
-      "rec    graph"
-      "trends trends"
-      "timeline timeline";
-  }
-}
-@media (max-width: 720px) {
-  .grid {
+/* --- Responsive: collapse sidebar to a top bar / hamburger (<900px) -------- */
+@media (max-width: 900px) {
+  .shell {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "health" "chain" "scores" "rec" "graph" "trends" "timeline";
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: auto;
+    flex-direction: column;
+    gap: 0;
+    padding: 10px 14px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar__brand {
+    padding: 0;
+    border-bottom: none;
+  }
+  .sidebar__hamburger {
+    display: grid;
+    place-items: center;
+  }
+  .nav {
+    display: none;
+    margin-top: 12px;
+  }
+  .sidebar--open .nav {
+    display: flex;
+  }
+  .content {
+    padding: 16px;
+    max-width: none;
+  }
+  .explain {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .explain__divider {
+    display: none;
   }
 }
 
@@ -207,7 +467,6 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
-  height: 100%;
 }
 .panel__head {
   display: flex;
@@ -682,17 +941,6 @@ body {
 }
 
 /* --- 7. Timeline ----------------------------------------------------------- */
-.transport {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.scrub {
-  width: 180px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
 .log {
   list-style: none;
   margin: 0;
@@ -702,6 +950,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+/* Timeline VIEW gets a taller log since it's the whole view now. */
+.log--tall {
+  max-height: 62vh;
 }
 .log__row {
   display: grid;
