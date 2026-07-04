@@ -79,10 +79,6 @@ class ImpactEngine:
         "vehicle_availability": 0.10,
     }
 
-    #: How much decision-confidence (Trust) is allowed to modulate the final value.
-    #: Bounded so Trust can never flip the consequence-driven ordering (§9, §14).
-    trust_modulation: float = 0.10
-
     def __init__(self, weights: dict[str, float] | None = None) -> None:
         if weights is not None:
             self.weights = dict(weights)
@@ -174,17 +170,13 @@ class ImpactEngine:
         factors = self._factors(path)
 
         base = sum(self.weights.get(name, 0.0) * value for name, value in factors.items())
-        base = _clamp01(base)
 
-        # Trust lightly modulates confidence in the priority, never the consequence
-        # itself, and stays within +/- `trust_modulation` so ordering is preserved.
-        if trust is not None:
-            trust_norm = _clamp01(trust.value / 100.0)
-            modulation = 1.0 - self.trust_modulation + self.trust_modulation * trust_norm
-        else:
-            modulation = 1.0
-
-        value = float(np.clip(100.0 * base * modulation, 0.0, 100.0))
+        # Impact is PURELY consequence-driven. Trust is deliberately NOT folded into
+        # the value: per §9/§14 the two are separate axes and Trust must never alter
+        # the consequence ordering. The `trust` parameter is accepted for call-site
+        # compatibility and is surfaced beside impact on the dashboard, never merged
+        # into it.
+        value = float(np.clip(100.0 * _clamp01(base), 0.0, 100.0))
 
         return ImpactScore(
             value=value,
