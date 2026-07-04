@@ -24,6 +24,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+# Emit UTF-8 so section signs (§) and arrows (→) render on Windows code pages.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
+
 from fpi.pipeline import FPIPipeline
 from fpi.schemas import HealthState, Subsystem
 from fpi.synthetic import generate_nominal, generate_scenario
