@@ -1,2 +1,5 @@
 *
 !.gitignore
+# Allow git to descend into data/real/ so its own .gitignore applies there
+# (real benchmark data files themselves stay ignored by data/real/.gitignore).
+!real/

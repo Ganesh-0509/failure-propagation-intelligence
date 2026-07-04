@@ -310,28 +310,56 @@ def load_scenario_records(path: str | Path) -> dict:
 # Public-dataset loader STUB (§12 Category 1) -- intentionally not implemented
 # --------------------------------------------------------------------------- #
 def load_public_dataset(name: str):
-    """Load a real public benchmark dataset for per-subsystem detector validation.
+    """Load a REAL public benchmark dataset for per-subsystem detector validation.
 
-    STUB ONLY -- not implemented, and downloads nothing.
+    Delegates to :mod:`fpi.datasets`, which parses genuine downloaded benchmarks
+    into ``(X, y, feature_names)`` numpy tuples. Supported names (§12 Category 1),
+    used to validate detectors IN ISOLATION:
 
-    Intended sources (§12 Category 1), to validate detectors in isolation:
-      * ``"nasa_battery"`` -- NASA Prognostics Center of Excellence Li-ion battery
-        aging/degradation dataset (charge/discharge cycling to failure).
-      * ``"cwru_bearing"`` -- Case Western Reserve University (CWRU) rolling-element
-        bearing vibration dataset (seeded inner/outer-race and ball faults).
+      * ``"nasa_battery"`` -- NASA PCoE 18650 Li-ion battery aging dataset
+        (:func:`fpi.datasets.load_battery_dataset`) -> BATTERY detector.
+      * ``"cwru_bearing"`` -- CWRU rolling-element bearing vibration dataset
+        (:func:`fpi.datasets.load_bearing_dataset`)  -> MOTOR detector.
 
-    IMPORTANT: dataset LICENSES and terms of use MUST be verified before any
-    download, redistribution, or use. Do not fetch these automatically.
+    HONESTY BOUNDARY (§11A, §12, §15): these real datasets validate PER-SUBSYSTEM
+    DETECTION ONLY. There is NO public dataset of real CROSS-SUBSYSTEM
+    PROPAGATION, so the FPI propagation cascade (the rest of this module) stays
+    SYNTHETIC and is never validated by real data. Real = detection; synthetic =
+    propagation.
+
+    The data is NOT auto-downloaded here; fetch it first with
+    ``python scripts/fetch_datasets.py``. Dataset licenses (NASA PCoE = U.S.
+    Government public domain; CWRU = free for academic/research use) are recorded
+    in ``fpi.datasets.DATASET_SOURCES``.
+
+    Returns:
+        ``(X, y, feature_names)`` from the delegated loader.
 
     Raises:
-        NotImplementedError: always -- wire up a licensed local copy first.
+        ValueError: if ``name`` is not a supported dataset.
+        FileNotFoundError: if the dataset has not been downloaded yet (the error
+            includes the exact fetch command).
     """
-    raise NotImplementedError(
-        "Public-dataset loading is a stub. Supported names would be "
-        "'nasa_battery' (NASA Li-ion battery degradation) and 'cwru_bearing' "
-        "(CWRU bearing vibration). Verify each dataset's license before use; "
-        "nothing is downloaded automatically."
-    )
+    # Imported lazily so fpi.synthetic has no hard dependency on scipy/loaders.
+    from fpi import datasets
+
+    key = name.strip().lower()
+    loaders = {
+        "nasa_battery": datasets.load_battery_dataset,
+        "nasa": datasets.load_battery_dataset,
+        "battery": datasets.load_battery_dataset,
+        "cwru_bearing": datasets.load_bearing_dataset,
+        "cwru": datasets.load_bearing_dataset,
+        "bearing": datasets.load_bearing_dataset,
+    }
+    if key not in loaders:
+        raise ValueError(
+            f"unknown public dataset {name!r}; supported: 'nasa_battery' "
+            f"(NASA Li-ion battery degradation) and 'cwru_bearing' "
+            f"(CWRU bearing vibration). Fetch with "
+            f"'python scripts/fetch_datasets.py'."
+        )
+    return loaders[key]()
 
 
 __all__ = [

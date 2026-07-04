@@ -120,12 +120,23 @@ workflow/architecture check only, per the guardrails above.
 
 ## Datasets (§12)
 
+- **Real public benchmarks** (`fpi/datasets.py`, `docs/DATASETS.md`) — now wired in and
+  used to validate **per-subsystem detection** on real data:
+  - **NASA PCoE Li-ion battery aging** (B0005) → battery detector (US-Gov public domain)
+  - **CWRU 12 kHz bearing vibration** (normal + seeded faults) → motor detector (free for research)
+  ```bash
+  python scripts/fetch_datasets.py     # download + cache into data/real/ (gitignored)
+  python scripts/validate_real.py      # train on real data, report held-out accuracy
+  ```
+  Measured on held-out real data: battery ~0.98, motor ~1.00 (see `docs/DATASETS.md`;
+  capacity is excluded from battery features to avoid label leakage).
 - **Synthetic** (`fpi/synthetic.py`): physics-informed heuristics for the thermal →
-  drivetrain cascade. Workflow validation only.
-- **Public benchmarks** (loader stub `fpi.synthetic.load_public_dataset`): NASA battery
-  degradation, CWRU bearing. **Verify licenses and current hosting before use** —
-  the stub intentionally does not download anything.
+  drivetrain cascade — used for the **propagation** demo and workflow validation only.
 - **Industrial fleet / CAN / OEM telemetry**: future work, requires a partner (§12 Cat 3).
+
+> **Real = detection, synthetic = propagation.** The real datasets above are
+> component-level. No public dataset of real cross-subsystem propagation exists (§18), so
+> FPI's propagation cascade remains synthetic and is never claimed as real-data-validated.
 
 ---
 

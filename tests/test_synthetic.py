@@ -129,6 +129,21 @@ def test_invalid_kind_raises():
         generate_scenario(kind="explosion")
 
 
-def test_public_dataset_loader_is_stub():
-    with pytest.raises(NotImplementedError):
-        load_public_dataset("nasa_battery")
+def test_public_dataset_unknown_name_raises():
+    # Wired to fpi.datasets: an unsupported name raises a clear ValueError.
+    with pytest.raises(ValueError):
+        load_public_dataset("not_a_real_dataset")
+
+
+def test_public_dataset_known_name_delegates():
+    # A supported name delegates to fpi.datasets. If the real data has not been
+    # downloaded, the loader raises FileNotFoundError (with a fetch hint); if it
+    # HAS been downloaded, it returns an (X, y, feature_names) tuple. Either way
+    # it must NOT raise NotImplementedError / ValueError.
+    try:
+        X, y, names = load_public_dataset("nasa_battery")
+    except FileNotFoundError:
+        return  # data not fetched in this environment -- acceptable
+    assert X.shape[0] == y.shape[0] == len(y)
+    assert X.shape[1] == len(names)
+    assert set(int(v) for v in set(y)) <= {0, 1}
