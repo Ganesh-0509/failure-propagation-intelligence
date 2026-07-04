@@ -14,6 +14,16 @@ This repository implements the MVP described in
 `Failure_Propagation_Intelligence_Whitepaper (1).docx`. See `PROJECT_PLAN.md` for the
 full build plan mapped to the whitepaper sections.
 
+## Dashboard
+
+![FPI technician dashboard — the §14 panel grid](docs/dashboard.png)
+
+The technician panel grid (§14) running on demonstration data: single-glance subsystem
+health, the active propagation chain with origin and next-at-risk nodes, **Trust and
+Impact shown as two separate scores (never merged)**, the subsystem dependency graph,
+signal trends, and verification-only recommendations. Shown here in offline sample mode;
+it renders the same against the live API.
+
 ---
 
 ## Honesty guardrails (please read)
